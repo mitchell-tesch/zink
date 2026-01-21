@@ -94,6 +94,15 @@ pub fn build(b: *std.Build) void {
 
     exe.linkLibrary(raylib_artifact);
 
+    // Add a step to install the "assets" directory
+    const install_assets = b.addInstallDirectory(.{
+        .source_dir = b.path("assets"),
+        .install_dir = .bin,
+        .install_subdir = "assets",
+    });
+
+    b.getInstallStep().dependOn(&install_assets.step);
+
     // This declares intent for the executable to be installed into the
     // install prefix when running `zig build` (i.e. when executing the default
     // step). By default the install prefix is `zig-out/` but can be overridden
@@ -114,6 +123,7 @@ pub fn build(b: *std.Build) void {
     // how this Run step will be executed. In our case we want to run it when
     // the user runs `zig build run`, so we create a dependency link.
     const run_cmd = b.addRunArtifact(exe);
+    run_cmd.step.dependOn(&install_assets.step);
     run_step.dependOn(&run_cmd.step);
 
     // By making the run step depend on the default step, it will be run from the

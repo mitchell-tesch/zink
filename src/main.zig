@@ -256,7 +256,14 @@ pub fn main() void {
 
     rl.initWindow(screenWidth, screenHeight, "zink");
     defer rl.closeWindow();
+
     rl.setTargetFPS(60);
+
+    const background_image: rl.Image = try rl.loadImage("assets/images/bg1.png");
+    defer rl.unloadImage(background_image);
+
+    const background_texture: rl.Texture2D = rl.loadTextureFromImage(background_image);
+    defer rl.unloadTexture(background_texture);
 
     while (!rl.windowShouldClose()) {
         rl.beginDrawing();
@@ -453,6 +460,13 @@ pub fn main() void {
         }
 
         // Draw logic
+        rl.drawTexture(
+            background_texture,
+            screenWidth / 2 - background_texture.width / 2,
+            screenHeight / 2 - background_texture.height / 2,
+            rl.WHITE,
+        );
+
         const levelText = rl.textFormat("Level %d", .{level});
         rl.drawText(levelText, 15, screenHeight - 30, 25, rl.Color.light_gray);
         const scoreText = rl.textFormat("Score: %d", .{score});
